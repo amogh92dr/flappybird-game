@@ -39,7 +39,7 @@ require 'PipePair'
 -- physical screen dimensions
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
-
+ISPAUSED = false
 -- virtual resolution dimensions
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
@@ -81,7 +81,7 @@ function love.load()
     ['explosion'] = love.audio.newSource('asset/sound/explosion.wav', 'static'),
     ['hurt'] = love.audio.newSource('asset/sound/hurt.wav', 'static'),
     ['score'] = love.audio.newSource('asset/sound/score.wav', 'static'),
-
+    ['pause'] = love.audio.newSource('asset/sound/pause.wav', 'static'),
     -- https://freesound.org/people/xsgianni/sounds/388079/
     ['music'] = love.audio.newSource('asset/sound/marios_way.mp3', 'static')
   }
@@ -147,9 +147,16 @@ function love.mouse.wasPressed(button)
 end
 
 function love.update(dt)
-  if scrolling then
+  if scrolling and ISPAUSED == false then
     backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
     groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
+  end
+  if ISPAUSED == false then
+    if sounds['music']:isPlaying() == false then
+      sounds['music']:play()
+    end
+  else
+    sounds['music']:pause()
   end
 
   gStateMachine:update(dt)
@@ -160,7 +167,6 @@ end
 
 function love.draw()
   push:start()
-
   love.graphics.draw(background, - backgroundScroll, 0)
   gStateMachine:render()
   love.graphics.draw(ground, - groundScroll, VIRTUAL_HEIGHT - 16)

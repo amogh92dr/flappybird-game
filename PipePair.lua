@@ -21,7 +21,8 @@ function PipePair:init(y, gap)
   -- instantiate two pipes that belong to this pair
   self.pipes = {
     ['upper'] = Pipe('top', self.y),
-    ['lower'] = Pipe('bottom', self.y + PIPE_HEIGHT + self.gap)
+    -- setting limits to avoid pipes going in the ground
+    ['lower'] = Pipe('bottom', math.min(self.y + PIPE_HEIGHT + self.gap, VIRTUAL_HEIGHT - 10))
   }
 
   -- whether this pipe pair is ready to be removed from the scene
